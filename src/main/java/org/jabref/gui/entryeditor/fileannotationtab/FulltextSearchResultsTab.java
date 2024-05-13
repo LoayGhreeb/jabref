@@ -30,9 +30,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.LuceneSearchResults;
-import org.jabref.model.pdf.search.SearchResult;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.SearchResult;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         return this.stateManager.activeSearchQueryProperty().isPresent().get() &&
                 this.stateManager.activeSearchQueryProperty().get().isPresent() &&
                 this.stateManager.activeSearchQueryProperty().get().get().getSearchFlags().contains(SearchFlags.FULLTEXT) &&
-                this.stateManager.activeSearchQueryProperty().get().get().toString().length() > 0;
+                !this.stateManager.activeSearchQueryProperty().get().get().toString().isEmpty();
     }
 
     @Override
@@ -101,7 +101,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             return;
         }
 
-        LuceneSearchResults searchResults = stateManager.getSearchResults().get(context).get(entry);
+        SearchResults searchResults = stateManager.getSearchResults().get(context).get(entry);
 
         if (searchResults.numSearchResults() == 0) {
             content.getChildren().add(new Text(Localization.lang("No search matches.")));

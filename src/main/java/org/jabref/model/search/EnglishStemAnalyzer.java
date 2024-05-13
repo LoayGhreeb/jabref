@@ -1,4 +1,4 @@
-package org.jabref.model.pdf.search;
+package org.jabref.model.search;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LowerCaseFilter;

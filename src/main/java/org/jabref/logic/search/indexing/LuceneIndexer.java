@@ -22,8 +22,8 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
-import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.model.search.EnglishStemAnalyzer;
+import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -125,7 +125,7 @@ public class LuceneIndexer {
                 directoryToIndex,
                 new IndexWriterConfig(
                         new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
-            indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
+            indexWriter.deleteDocuments(new Term(SearchFieldConstants.FILE_PATH, linkedFilePath));
             indexWriter.commit();
         } catch (IOException e) {
             LOGGER.warn("Could not initialize the IndexWriter!", e);
@@ -210,11 +210,11 @@ public class LuceneIndexer {
             // Check if a document with this path is already in the index
             try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
-                TermQuery query = new TermQuery(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
+                TermQuery query = new TermQuery(new Term(SearchFieldConstants.FILE_PATH, linkedFile.getLink()));
                 TopDocs topDocs = searcher.search(query, 1);
                 // If a document was found, check if is less current than the one in the FS
                 if (topDocs.scoreDocs.length > 0) {
-                    Document doc = reader.document(topDocs.scoreDocs[0].doc);
+                    Document doc = reader.storedFields().document(topDocs.scoreDocs[0].doc);
                     long indexModificationTime = Long.parseLong(doc.getField(SearchFieldConstants.MODIFIED).stringValue());
 
                     BasicFileAttributes attributes = Files.readAttributes(resolvedPath.get(), BasicFileAttributes.class);
@@ -289,7 +289,7 @@ public class LuceneIndexer {
      * @return all file paths
      */
     public Set<String> getListOfFilePaths() {
-        return getListOfField(SearchFieldConstants.PATH);
+        return getListOfField(SearchFieldConstants.FILE_PATH);
     }
 
     /**
@@ -306,7 +306,7 @@ public class LuceneIndexer {
                 directoryToIndex,
                 new IndexWriterConfig(
                         new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
-            QueryParser queryParser = new QueryParser(SearchFieldConstants.PATH, new EnglishStemAnalyzer());
+            QueryParser queryParser = new QueryParser(SearchFieldConstants.FILE_PATH, new EnglishStemAnalyzer());
             queryParser.setAllowLeadingWildcard(true);
             indexWriter.deleteDocuments(queryParser.parse("*"));
             indexWriter.commit();

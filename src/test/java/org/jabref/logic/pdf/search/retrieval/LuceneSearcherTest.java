@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.logic.util.StandardFileType;
@@ -15,8 +14,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.pdf.search.LuceneSearchResults;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
+import org.jabref.logic.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -65,7 +65,7 @@ public class LuceneSearcherTest {
         insertPdfsForSearch();
         initIndexer();
 
-        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        HashMap<BibEntry, SearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(8, hits);
     }
@@ -75,7 +75,7 @@ public class LuceneSearcherTest {
         insertPdfsForSearch();
         initIndexer();
 
-        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("University", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        HashMap<BibEntry, SearchResults> searchResults = searcher.search(new SearchQuery("University", EnumSet.noneOf(SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(1, hits);
     }
@@ -85,7 +85,7 @@ public class LuceneSearcherTest {
         insertPdfsForSearch();
         initIndexer();
 
-        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("and", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        HashMap<BibEntry, SearchResults> searchResults = searcher.search(new SearchQuery("and", EnumSet.noneOf(SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(0, hits);
     }
@@ -95,7 +95,7 @@ public class LuceneSearcherTest {
         insertPdfsForSearch();
         initIndexer();
 
-        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("second", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        HashMap<BibEntry, SearchResults> searchResults = searcher.search(new SearchQuery("second", EnumSet.noneOf(SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(4, hits);
     }
@@ -105,7 +105,7 @@ public class LuceneSearcherTest {
         insertPdfsForSearch();
         initIndexer();
 
-        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("annotation", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        HashMap<BibEntry, SearchResults> searchResults = searcher.search(new SearchQuery("annotation", EnumSet.noneOf(SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(2, hits);
     }
@@ -115,7 +115,7 @@ public class LuceneSearcherTest {
         insertPdfsForSearch();
         initIndexer();
 
-        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        HashMap<BibEntry, SearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(0, hits);
     }

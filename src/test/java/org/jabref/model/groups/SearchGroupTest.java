@@ -4,7 +4,7 @@ import java.util.EnumSet;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ public class SearchGroupTest {
 
     @Test
     public void containsFindsWordWithRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchFlags.SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 
@@ -24,7 +24,7 @@ public class SearchGroupTest {
 
     @Test
     public void containsDoesNotFindsWordWithInvalidRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchFlags.SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 
@@ -33,7 +33,7 @@ public class SearchGroupTest {
 
     @Test
     public void notQueryWorksWithLeftPartOfQuery() {
-        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchFlags.SearchFlags.class));
 
         BibEntry alphaEntry = new BibEntry()
                 .withCitationKey("alpha")
@@ -43,7 +43,7 @@ public class SearchGroupTest {
 
     @Test
     public void notQueryWorksWithLRightPartOfQuery() {
-        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchFlags.SearchFlags.class));
 
         BibEntry betaEntry = new BibEntry()
                 .withCitationKey("beta")

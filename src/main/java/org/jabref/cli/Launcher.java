@@ -138,7 +138,7 @@ public class Launcher {
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
-        configuration.entrySet().forEach(config -> Configuration.set(config.getKey(), config.getValue()));
+        configuration.forEach(Configuration::set);
         initializeLogger();
     }
 
@@ -201,9 +201,9 @@ public class Launcher {
                         && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
-                            .sorted(Comparator.reverseOrder())
-                            .map(Path::toFile)
-                            .forEach(File::delete);
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
                 }
             }
         } catch (IOException e) {

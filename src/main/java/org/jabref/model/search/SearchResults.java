@@ -1,4 +1,4 @@
-package org.jabref.model.pdf.search;
+package org.jabref.model.search;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class LuceneSearchResults {
+public final class SearchResults {
 
     private final List<SearchResult> searchResults = new LinkedList<>();
 
@@ -24,13 +24,7 @@ public final class LuceneSearchResults {
     public HashMap<String, List<SearchResult>> getSearchResultsByPath() {
         HashMap<String, List<SearchResult>> resultsByPath = new HashMap<>();
         for (SearchResult result : searchResults) {
-            if (resultsByPath.containsKey(result.getPath())) {
-                resultsByPath.get(result.getPath()).add(result);
-            } else {
-                List<SearchResult> resultsForPath = new ArrayList<>();
-                resultsForPath.add(result);
-                resultsByPath.put(result.getPath(), resultsForPath);
-            }
+            resultsByPath.computeIfAbsent(result.getFilePath(), key -> new ArrayList<>()).add(result);
         }
         return resultsByPath;
     }
@@ -43,11 +37,14 @@ public final class LuceneSearchResults {
         this.searchResults.add(result);
     }
 
-    public float getSearchScore() {
-        return this.searchResults.stream().map(SearchResult::getLuceneScore).max(Comparator.comparing(Float::floatValue)).orElse(Float.valueOf(0));
+    public float getMaxSearchScore() {
+        return this.searchResults.stream()
+                                 .map(SearchResult::getLuceneScore)
+                                 .max(Comparator.comparing(Float::floatValue))
+                                 .orElse(0F);
     }
 
     public boolean hasFulltextResults() {
-        return this.searchResults.stream().map(SearchResult::hasFulltextResults).anyMatch(Boolean::valueOf);
+        return this.searchResults.stream().anyMatch(SearchResult::hasFulltextResults);
     }
 }

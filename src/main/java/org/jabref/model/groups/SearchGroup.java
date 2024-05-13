@@ -10,8 +10,7 @@ import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +39,9 @@ public class SearchGroup extends AbstractGroup {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SearchGroup)) {
+        if (!(o instanceof SearchGroup other)) {
             return false;
         }
-        SearchGroup other = (SearchGroup) o;
         return Objects.equals(getName(), other.getName())
                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
                && Objects.equals(getSearchExpression(), other.getSearchExpression())
@@ -55,7 +53,7 @@ public class SearchGroup extends AbstractGroup {
         return matches.contains(entry);
     }
 
-    public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
+    public EnumSet<SearchFlags> getSearchFlags() {
         return query.getSearchFlags();
     }
 

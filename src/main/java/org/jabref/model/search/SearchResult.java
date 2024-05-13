@@ -1,9 +1,8 @@
-package org.jabref.model.pdf.search;
+package org.jabref.model.search;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -20,51 +19,52 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 
-import static org.jabref.model.pdf.search.SearchFieldConstants.ANNOTATIONS;
-import static org.jabref.model.pdf.search.SearchFieldConstants.BIB_ENTRY_ID_HASH;
-import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PAGE_NUMBER;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
+import static org.jabref.model.search.SearchFieldConstants.BIB_ENTRY_ID_HASH;
+import static org.jabref.model.search.SearchFieldConstants.FILE_ANNOTATIONS;
+import static org.jabref.model.search.SearchFieldConstants.FILE_CONTENT;
+import static org.jabref.model.search.SearchFieldConstants.FILE_PATH;
+import static org.jabref.model.search.SearchFieldConstants.MODIFIED;
+import static org.jabref.model.search.SearchFieldConstants.PAGE_NUMBER;
 
 public final class SearchResult {
 
-    private final String path;
-
-    private final int pageNumber;
-    private final long modified;
     private final int hash;
-    private final boolean hasFulltextResults;
-
+    private final int pageNumber;
+    private final String filePath;
+    private final long modified;
     private final float luceneScore;
+    private final boolean hasFulltextResults;
     private List<String> contentResultStringsHtml = List.of();
     private List<String> annotationsResultStringsHtml = List.of();
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.luceneScore = scoreDoc.score;
-        this.path = getFieldContents(searcher, scoreDoc, PATH);
-        if (this.path.length() > 0) {
+        this.filePath = getFieldContents(searcher, scoreDoc, FILE_PATH);
+
+        if (!this.filePath.isEmpty()) {
             // pdf result
             this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
             this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
             this.hash = 0;
 
-            String content = getFieldContents(searcher, scoreDoc, CONTENT);
-            String annotations = getFieldContents(searcher, scoreDoc, ANNOTATIONS);
+            String content = getFieldContents(searcher, scoreDoc, FILE_CONTENT);
+            String annotations = getFieldContents(searcher, scoreDoc, FILE_ANNOTATIONS);
             this.hasFulltextResults = !(content.isEmpty() && annotations.isEmpty());
 
             Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
-            try (TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content)) {
+            try (EnglishStemAnalyzer analyzer = new EnglishStemAnalyzer();
+                TokenStream contentStream = analyzer.tokenStream(FILE_CONTENT, content)) {
                 TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
-                this.contentResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
+                this.contentResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).toList();
             } catch (InvalidTokenOffsetsException e) {
                 this.contentResultStringsHtml = List.of();
             }
 
-            try (TokenStream annotationStream = new EnglishStemAnalyzer().tokenStream(ANNOTATIONS, annotations)) {
+            try (EnglishStemAnalyzer analyzer = new EnglishStemAnalyzer();
+                TokenStream annotationStream = analyzer.tokenStream(FILE_ANNOTATIONS, annotations)) {
                 TextFragment[] frags = highlighter.getBestTextFragments(annotationStream, annotations, true, 10);
-                this.annotationsResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
+                this.annotationsResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).toList();
             } catch (InvalidTokenOffsetsException e) {
                 this.annotationsResultStringsHtml = List.of();
             }
@@ -78,18 +78,24 @@ public final class SearchResult {
     }
 
     public List<BibEntry> getMatchingEntries(BibDatabaseContext databaseContext) {
-        if (this.path.length() > 0) {
-            return getEntriesWithFile(path, databaseContext);
+        if (hasFulltextResults) {
+            return databaseContext.getEntries()
+                                  .stream()
+                                  .filter(entry -> entry.getFiles()
+                                                        .stream()
+                                                        .map(LinkedFile::getLink)
+                                                        .anyMatch(link -> link.equals(filePath)))
+                                  .toList();
         }
-        return databaseContext.getEntries().stream().filter(bibEntry -> bibEntry.getLastIndexHash() == this.hash).collect(Collectors.toList());
-    }
 
-    private List<BibEntry> getEntriesWithFile(String path, BibDatabaseContext databaseContext) {
-        return databaseContext.getEntries().stream().filter(entry -> entry.getFiles().stream().map(LinkedFile::getLink).anyMatch(link -> link.equals(path))).collect(Collectors.toList());
+        return databaseContext.getEntries()
+                              .stream()
+                              .filter(bibEntry -> bibEntry.getLastIndexHash() == this.hash)
+                              .toList();
     }
 
     private String getFieldContents(IndexSearcher searcher, ScoreDoc scoreDoc, String field) throws IOException {
-        IndexableField indexableField = searcher.doc(scoreDoc.doc).getField(field);
+        IndexableField indexableField = searcher.storedFields().document(scoreDoc.doc).getField(field);
         if (indexableField == null) {
             return "";
         }
@@ -97,14 +103,16 @@ public final class SearchResult {
     }
 
     public float getSearchScoreFor(BibEntry entry) {
-        if (this.path != null) {
-            return entry.getFiles().stream().anyMatch(linkedFile -> path.equals(linkedFile.getLink())) ? luceneScore : 0;
+        if (hasFulltextResults) {
+            return entry.getFiles()
+                        .stream()
+                        .anyMatch(linkedFile -> filePath.equals(linkedFile.getLink())) ? luceneScore : 0;
         }
         return entry.getLastIndexHash() == hash ? luceneScore : 0;
     }
 
-    public String getPath() {
-        return path;
+    public String getFilePath() {
+        return filePath;
     }
 
     public long getModified() {

@@ -7,8 +7,8 @@ import java.util.Objects;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.pdf.search.LuceneSearchResults;
-import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.search.SearchResult;
+import org.jabref.model.search.SearchResults;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -41,10 +41,10 @@ public final class LuceneSearcher {
      * @param query query to search for
      * @return a result map of all entries that have matches in any fields
      */
-    public HashMap<BibEntry, LuceneSearchResults> search(SearchQuery query) {
+    public HashMap<BibEntry, SearchResults> search(SearchQuery query) {
         Objects.requireNonNull(query);
 
-        HashMap<BibEntry, LuceneSearchResults> results = new HashMap<>();
+        HashMap<BibEntry, SearchResults> results = new HashMap<>();
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
             TopDocs docs = searcher.search(query.getQuery(), Integer.MAX_VALUE);
@@ -53,7 +53,7 @@ public final class LuceneSearcher {
                 for (BibEntry match : searchResult.getMatchingEntries(databaseContext)) {
                     if (searchResult.getLuceneScore() > 0) {
                         if (!results.containsKey(match)) {
-                            results.put(match, new LuceneSearchResults());
+                            results.put(match, new SearchResults());
                         }
                         results.get(match).addResult(searchResult);
                     }

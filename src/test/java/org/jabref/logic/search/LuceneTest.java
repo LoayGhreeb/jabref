@@ -1,6 +1,6 @@
 package org.jabref.logic.search;
 
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
+import org.jabref.model.search.EnglishStemAnalyzer;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;

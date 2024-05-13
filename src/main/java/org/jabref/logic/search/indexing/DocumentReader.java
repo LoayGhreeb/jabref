@@ -30,11 +30,11 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.pdf.search.SearchFieldConstants.ANNOTATIONS;
-import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PAGE_NUMBER;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
+import static org.jabref.model.search.SearchFieldConstants.FILE_ANNOTATIONS;
+import static org.jabref.model.search.SearchFieldConstants.FILE_CONTENT;
+import static org.jabref.model.search.SearchFieldConstants.FILE_PATH;
+import static org.jabref.model.search.SearchFieldConstants.MODIFIED;
+import static org.jabref.model.search.SearchFieldConstants.PAGE_NUMBER;
 
 /**
  * Utility class for reading the data from LinkedFiles of a BibEntry for Lucene.
@@ -70,10 +70,7 @@ public final class DocumentReader {
      */
     public Optional<List<Document>> readLinkedPdf(BibDatabaseContext databaseContext, LinkedFile pdf) {
         Optional<Path> pdfPath = pdf.findIn(databaseContext, filePreferences);
-        if (pdfPath.isPresent()) {
-            return Optional.of(readPdfContents(pdf, pdfPath.get()));
-        }
-        return Optional.empty();
+        return pdfPath.map(path -> readPdfContents(pdf, path));
     }
 
     /**
@@ -150,16 +147,16 @@ public final class DocumentReader {
 
         String pdfContent = pdfTextStripper.getText(pdfDocument);
         if (StringUtil.isNotBlank(pdfContent)) {
-            newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
+            newDocument.add(new TextField(FILE_CONTENT, mergeLines(pdfContent), Field.Store.YES));
         }
         PDPage page = pdfDocument.getPage(pageNumber);
         List<String> annotations = page.getAnnotations().stream().filter(annotation -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
         if (!annotations.isEmpty()) {
-            newDocument.add(new TextField(ANNOTATIONS, annotations.stream().collect(Collectors.joining("\n")), Field.Store.YES));
+            newDocument.add(new TextField(FILE_ANNOTATIONS, String.join("\n", annotations), Field.Store.YES));
         }
     }
 
     private void addIdentifiers(Document newDocument, String path) {
-        newDocument.add(new StringField(PATH, path, Field.Store.YES));
+        newDocument.add(new StringField(FILE_PATH, path, Field.Store.YES));
     }
 }

@@ -30,7 +30,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.pdf.search.LuceneSearchResults;
+import org.jabref.model.search.SearchResults;
 import org.jabref.model.util.OptionalUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -60,7 +60,7 @@ public class StateManager {
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
-    private final ObservableMap<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>> searchResults = FXCollections.observableHashMap();
+    private final ObservableMap<BibDatabaseContext, Map<BibEntry, SearchResults>> searchResults = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
@@ -197,7 +197,7 @@ public class StateManager {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
     }
 
-    public ObservableMap<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>> getSearchResults() {
+    public ObservableMap<BibDatabaseContext, Map<BibEntry, SearchResults>> getSearchResults() {
         return searchResults;
     }
 

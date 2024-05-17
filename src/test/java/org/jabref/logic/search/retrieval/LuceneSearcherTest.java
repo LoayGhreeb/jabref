@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search.retrieval;
+package org.jabref.logic.search.retrieval;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.indexing.LuceneIndexer;
-import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -15,7 +15,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;

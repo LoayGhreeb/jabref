@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -48,12 +47,9 @@ import org.apache.lucene.store.NIOFSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Indexes the text of PDF files and adds it into the lucene search index.
- */
 public class LuceneIndexer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LuceneIndexer.class);
 
     private final Directory directoryToIndex;
     private final BibDatabaseContext databaseContext;
@@ -272,7 +268,7 @@ public class LuceneIndexer {
             MatchAllDocsQuery query = new MatchAllDocsQuery();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
-                Document doc = reader.document(scoreDoc.doc);
+                Document doc = reader.storedFields().document(scoreDoc.doc);
                 if (doc.getField(field) != null) {
                     values.add(doc.getField(field).stringValue());
                 }
@@ -302,10 +298,8 @@ public class LuceneIndexer {
     }
 
     public void deleteLinkedFilesIndex() {
-        try (IndexWriter indexWriter = new IndexWriter(
-                directoryToIndex,
-                new IndexWriterConfig(
-                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
+                new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
             QueryParser queryParser = new QueryParser(SearchFieldConstants.FILE_PATH, new EnglishStemAnalyzer());
             queryParser.setAllowLeadingWildcard(true);
             indexWriter.deleteDocuments(queryParser.parse("*"));

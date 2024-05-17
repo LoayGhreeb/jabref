@@ -46,7 +46,7 @@ public class LuceneTest {
         ScoreDoc[] hits = searcher.search(query, 10).scoreDocs;
 
         for (ScoreDoc scoreDoc : hits) {
-            Document doc = searcher.doc(scoreDoc.doc);
+            Document doc = searcher.storedFields().document(scoreDoc.doc);
             System.out.println(doc.get("content"));
         }
     }

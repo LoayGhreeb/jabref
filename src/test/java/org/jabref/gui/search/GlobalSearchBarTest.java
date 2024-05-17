@@ -44,7 +44,7 @@ public class GlobalSearchBarTest {
     @Start
     public void onStart(Stage stage) {
         SearchPreferences searchPreferences = mock(SearchPreferences.class);
-        when(searchPreferences.getSearchFlags()).thenReturn(EnumSet.noneOf(SearchFlags.SearchFlags.class));
+        when(searchPreferences.getSearchFlags()).thenReturn(EnumSet.noneOf(SearchFlags.class));
         PreferencesService prefs = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(prefs.getSearchPreferences()).thenReturn(searchPreferences);
 

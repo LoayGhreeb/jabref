@@ -21,11 +21,11 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.EnglishStemAnalyzer;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -76,7 +76,7 @@ public class LuceneIndexer {
      */
     public void createIndex() {
         // Create new index by creating IndexWriter but not writing anything.
-        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
+        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new StandardAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
             // empty comment for checkstyle
         } catch (IOException e) {
             LOGGER.warn("Could not create new Index!", e);
@@ -103,7 +103,7 @@ public class LuceneIndexer {
         try (IndexWriter indexWriter = new IndexWriter(
                 directoryToIndex,
                 new IndexWriterConfig(
-                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+                        new StandardAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
             indexWriter.deleteDocuments(new Term(SearchFieldConstants.BIB_ENTRY_ID_HASH, String.valueOf(hash)));
             indexWriter.commit();
         } catch (IOException e) {
@@ -120,7 +120,7 @@ public class LuceneIndexer {
         try (IndexWriter indexWriter = new IndexWriter(
                 directoryToIndex,
                 new IndexWriterConfig(
-                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+                        new StandardAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
             indexWriter.deleteDocuments(new Term(SearchFieldConstants.FILE_PATH, linkedFilePath));
             indexWriter.commit();
         } catch (IOException e) {
@@ -156,7 +156,7 @@ public class LuceneIndexer {
         try {
             try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                     new IndexWriterConfig(
-                            new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+                            new StandardAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
                 Document document = new Document();
                 document.add(new StringField(SearchFieldConstants.BIB_ENTRY_ID_HASH, String.valueOf(bibEntry.getLastIndexHash()), org.apache.lucene.document.Field.Store.YES));
                 for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
@@ -227,7 +227,7 @@ public class LuceneIndexer {
             if (pages.isPresent()) {
                 try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                                                                new IndexWriterConfig(
-                                                                                     new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+                                                                                     new StandardAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
                     indexWriter.addDocuments(pages.get());
                     indexWriter.commit();
                 }
@@ -299,8 +299,8 @@ public class LuceneIndexer {
 
     public void deleteLinkedFilesIndex() {
         try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
-                new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
-            QueryParser queryParser = new QueryParser(SearchFieldConstants.FILE_PATH, new EnglishStemAnalyzer());
+                new IndexWriterConfig(new StandardAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+            QueryParser queryParser = new QueryParser(SearchFieldConstants.FILE_PATH, new StandardAnalyzer());
             queryParser.setAllowLeadingWildcard(true);
             indexWriter.deleteDocuments(queryParser.parse("*"));
             indexWriter.commit();

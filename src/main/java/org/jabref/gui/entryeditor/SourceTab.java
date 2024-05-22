@@ -124,6 +124,11 @@ public class SourceTab extends EntryEditorTab {
             // searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords); TODO btut: Pattern-Highlighting with lucene
             highlightSearchPattern();
         });
+
+        stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            highlightSearchPattern();
+        });
     }
 
     private void highlightSearchPattern() {
@@ -276,7 +281,7 @@ public class SourceTab extends EntryEditorTab {
             if (!database.hasEntries()) {
                 if (parserResult.hasWarnings()) {
                     // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings().get(0));
+                    throw new IllegalStateException(parserResult.warnings().getFirst());
                 } else {
                     throw new IllegalStateException("No entries found.");
                 }

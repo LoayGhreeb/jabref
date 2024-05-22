@@ -44,6 +44,8 @@ public class PreviewPanel extends VBox {
     private final PreviewViewer previewView;
     private final PreviewPreferences previewPreferences;
     private final DialogService dialogService;
+    private final StateManager stateManager;
+    private final IndexingTaskManager indexingTaskManager;
     private BibEntry entry;
 
     public PreviewPanel(BibDatabaseContext database,
@@ -56,8 +58,10 @@ public class PreviewPanel extends VBox {
                         TaskExecutor taskExecutor) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
         this.previewPreferences = preferencesService.getPreviewPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService, preferencesService.getFilePreferences(), database, dialogService);
+        this.indexingTaskManager = indexingTaskManager;
+        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
 
         PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
         previewView = new PreviewViewer(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
@@ -152,8 +156,8 @@ public class PreviewPanel extends VBox {
 
     public void setEntry(BibEntry entry) {
         this.entry = entry;
-        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setEntry(entry);
+        previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
     }
 
     public void print() {

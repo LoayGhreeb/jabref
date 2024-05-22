@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/org/jabref/logic/search/indexing/DocumentReader.java
 package org.jabref.logic.search.indexing;
-========
-package org.jabref.logic.pdf.search;
->>>>>>>> main:src/main/java/org/jabref/logic/pdf/search/DocumentReader.java
 
 import java.io.IOException;
 import java.nio.file.Files;

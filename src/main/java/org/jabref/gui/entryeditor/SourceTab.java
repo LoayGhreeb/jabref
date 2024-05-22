@@ -125,10 +125,10 @@ public class SourceTab extends EntryEditorTab {
             highlightSearchPattern();
         });
 
-        stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
-            highlightSearchPattern();
-        });
+//        stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+//            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+//            highlightSearchPattern();
+//        });
     }
 
     private void highlightSearchPattern() {

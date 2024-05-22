@@ -62,7 +62,10 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
@@ -129,7 +132,8 @@ public class GlobalSearchBar extends HBox {
         if (searchType == SearchType.NORMAL_SEARCH) {
             searchQueryProperty = stateManager.activeSearchQueryProperty();
         } else {
-            searchQueryProperty = stateManager.activeGlobalSearchQueryProperty();
+            searchQueryProperty = null;
+//            searchQueryProperty = stateManager.activeGlobalSearchQueryProperty();
         }
 
         KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
@@ -208,7 +212,7 @@ public class GlobalSearchBar extends HBox {
         if (searchType == SearchType.NORMAL_SEARCH) {
             modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString, filterModeButton, sortByScoreButton));
         } else {
-            modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton));
+            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton));
         }
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
@@ -294,7 +298,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(filterModeButton);
         filterModeButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.FILTERING_SEARCH, filterModeButton.isSelected());
-            performSearch();
+//            performSearch();
         });
 
         sortByScoreButton.setSelected(searchPreferences.isSortByScore());
@@ -302,7 +306,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(sortByScoreButton);
         sortByScoreButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.SORT_BY_SCORE, sortByScoreButton.isSelected());
-            performSearch();
+//            performSearch();
         });
 
         openGlobalSearchButton.disableProperty().bindBidirectional(globalSearchActive);
@@ -313,7 +317,7 @@ public class GlobalSearchBar extends HBox {
             if (globalSearchResultDialog == null) {
                 globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
             }
-            stateManager.activeGlobalSearchQueryProperty().setValue(searchQueryProperty.get());
+//            stateManager.activeGlobalSearchQueryProperty().setValue(searchQueryProperty.get());
             updateSearchQuery();
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);

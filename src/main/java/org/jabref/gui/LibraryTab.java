@@ -840,11 +840,6 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing directory monitor", e);
         }
         try {
-            PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
-        } catch (RuntimeException e) {
-            LOGGER.error("Problem when shutting down PDF indexer", e);
-        }
-        try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down autosave manager", e);

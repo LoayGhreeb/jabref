@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.search.retrieval;
 
 import java.io.IOException;
 import java.util.HashMap;

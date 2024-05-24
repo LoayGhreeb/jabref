@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -152,7 +153,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void testFlushIndex() throws IOException {
+    public void flushIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setCitationKey("Example2017");

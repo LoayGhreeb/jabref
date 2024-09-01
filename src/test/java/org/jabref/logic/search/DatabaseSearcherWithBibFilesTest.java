@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -60,7 +60,7 @@ class DatabaseSearcherWithBibFilesTest {
         BibDatabaseContext databaseContext = result.getDatabaseContext();
 
         when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(true);
-        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
+        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(true));
         return databaseContext;
     }
 

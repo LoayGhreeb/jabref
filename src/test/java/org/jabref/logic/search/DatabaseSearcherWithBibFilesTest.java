@@ -135,6 +135,15 @@ class DatabaseSearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
-        assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
+        LOGGER.trace("Matches: {}", matches);
+        for (BibEntry entry : matches) {
+            LOGGER.trace("Entry: {} with id {}", entry, entry.getId());
+        }
+
+        LOGGER.trace("Expected: {}", expected);
+        for (BibEntry entry : expected) {
+            LOGGER.trace("Entry: {} with id {}", entry, entry.getId());
+        }
+        assertThat(expected, Matchers.containsInAnyOrder(matches));
     }
 }

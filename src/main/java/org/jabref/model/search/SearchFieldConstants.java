@@ -19,7 +19,7 @@ public enum SearchFieldConstants {
 
     public static final Analyzer LATEX_AWARE_ANALYZER = new LatexAwareAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
     public static final Analyzer LATEX_AWARE_NGRAM_ANALYZER = new LatexAwareNGramAnalyzer(1, Integer.MAX_VALUE, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-    public static final List<String> PDF_FIELDS = List.of(PATH.toString(), CONTENT.toString(), ANNOTATIONS.toString());
+    public static final List<String> PDF_FIELDS = List.of(CONTENT.toString(), ANNOTATIONS.toString());
     private final String field;
 
     SearchFieldConstants(String field) {

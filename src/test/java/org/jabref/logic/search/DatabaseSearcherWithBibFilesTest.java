@@ -117,6 +117,7 @@ class DatabaseSearcherWithBibFilesTest {
                 .map(BibEntry::getCitationKey)
                 .flatMap(Optional::stream)
                 .toList();
+
         LOGGER.trace("Expected: {}", expected.stream().sorted().toList());
         LOGGER.trace("Matches: {}", matches.stream().sorted().toList());
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));

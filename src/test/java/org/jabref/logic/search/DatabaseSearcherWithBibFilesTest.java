@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,12 +14,8 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -40,34 +37,15 @@ import static org.mockito.Mockito.when;
 class DatabaseSearcherWithBibFilesTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcherWithBibFilesTest.class);
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
-    private static final BibEntry TITLE_SENTENCE_CASED = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("title-sentence-cased")
-            .withField(StandardField.TITLE, "Title Sentence Cased");
-    private static final BibEntry TITLE_MIXED_CASED = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("title-mixed-cased")
-            .withField(StandardField.TITLE, "TiTle MiXed CaSed");
-    private static final BibEntry TITLE_UPPER_CASED = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("title-upper-cased")
-            .withField(StandardField.TITLE, "TITLE UPPER CASED");
-
-    private static final BibEntry MINIMAL_SENTENCE_CASE = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-sentence-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-sentence-case.pdf", StandardFileType.PDF.getName())));
-    private static final BibEntry MINIMAL_ALL_UPPER_CASE = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-all-upper-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-all-upper-case.pdf", StandardFileType.PDF.getName())));
-    private static final BibEntry MINIMAL_MIXED_CASE = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-mixed-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-mixed-case.pdf", StandardFileType.PDF.getName())));
-    private static final BibEntry MINIMAL_NOTE_SENTENCE_CASE = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-note-sentence-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-note-sentence-case.pdf", StandardFileType.PDF.getName())));
-    private static final BibEntry MINIMAL_NOTE_ALL_UPPER_CASE = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-note-all-upper-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-note-all-upper-case.pdf", StandardFileType.PDF.getName())));
-    private static final BibEntry MINIMAL_NOTE_MIXED_CASE = new BibEntry(StandardEntryType.Misc)
-            .withCitationKey("minimal-note-mixed-case")
-            .withFiles(List.of(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
+    private static final String TITLE_SENTENCE_CASED = "title-sentence-cased";
+    private static final String TITLE_MIXED_CASED = "title-mixed-cased";
+    private static final String TITLE_UPPER_CASED = "title-upper-cased";
+    private static final String MINIMAL_SENTENCE_CASE = "minimal-sentence-case";
+    private static final String MINIMAL_ALL_UPPER_CASE = "minimal-all-upper-case";
+    private static final String MINIMAL_MIXED_CASE = "minimal-mixed-case";
+    private static final String MINIMAL_NOTE_SENTENCE_CASE = "minimal-note-sentence-case";
+    private static final String MINIMAL_NOTE_ALL_UPPER_CASE = "minimal-note-all-upper-case";
+    private static final String MINIMAL_NOTE_MIXED_CASE = "minimal-note-mixed-case";
 
     private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
     @TempDir
@@ -132,18 +110,14 @@ class DatabaseSearcherWithBibFilesTest {
 
     @ParameterizedTest
     @MethodSource
-    void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
+    void searchLibrary(List<String> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
-        LOGGER.trace("Matches: {}", matches);
-        for (BibEntry entry : matches) {
-            LOGGER.trace("Entry: {} with id {}", entry, entry.getId());
-        }
+        List<String> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, FILE_PREFERENCES)
+                .getMatches().stream()
+                .map(BibEntry::getCitationKey)
+                .flatMap(Optional::stream)
+                .toList();
 
-        LOGGER.trace("Expected: {}", expected);
-        for (BibEntry entry : expected) {
-            LOGGER.trace("Entry: {} with id {}", entry, entry.getId());
-        }
-        assertThat(expected, Matchers.containsInAnyOrder(matches));
+        assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }
